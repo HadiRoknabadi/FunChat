@@ -1,7 +1,16 @@
+using FunChat.Infrastructure.IoC;
+using FunChat.Infrastructure.IdentityConfigs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddApplicationDbContext(builder.Configuration);
+
+builder.Services.AddIdentityService();
+
+
 
 var app = builder.Build();
 
