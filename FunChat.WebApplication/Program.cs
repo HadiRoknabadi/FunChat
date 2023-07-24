@@ -1,5 +1,8 @@
 using FunChat.Infrastructure.IoC;
 using FunChat.Infrastructure.IdentityConfigs;
+using FunChat.Infrastructure.MappingProfile;
+using FluentValidation;
+using FunChat.Application.DTOs.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 
 builder.Services.AddIdentityService();
+
+builder.Services.AddAutoMapper(typeof(UserMappingProfile));
+builder.Services.AddTransient<IValidator<RegisterUserDTO>, RegisterUserValidator>();
+builder.Services.AddTransient<IValidator<LoginUserDTO>, LoginUserValidator>();
+
 
 
 
