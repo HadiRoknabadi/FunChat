@@ -3,6 +3,8 @@ using FunChat.Infrastructure.IdentityConfigs;
 using FunChat.Infrastructure.MappingProfile;
 using FluentValidation;
 using FunChat.Application.DTOs.Account;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,11 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddTransient<IValidator<RegisterUserDTO>, RegisterUserValidator>();
 builder.Services.AddTransient<IValidator<LoginUserDTO>, LoginUserValidator>();
 
+#region Html Encoder
+
+builder.Services.AddSingleton<HtmlEncoder>(HtmlEncoder.Create(allowedRanges: new[] { UnicodeRanges.BasicLatin, UnicodeRanges.Arabic }));
+
+#endregion
 
 
 

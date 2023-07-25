@@ -26,4 +26,9 @@
 	  <ProjectReference Include="..\FunChat.Infrastructure\FunChat.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\AdminPanel\" />
+	  <Folder Include="wwwroot\Site\" />
+	</ItemGroup>
+
 </Project>
