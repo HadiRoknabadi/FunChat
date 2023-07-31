@@ -20,9 +20,11 @@ TempData["SweetAlertInfoMessage"] != null
 
     if (TempData["ToastErrorMessage"] != null)
     {
+        @* var errorMessages=TempData["ToastErrorMessage"] as List<string>; *@
         <script>
             $(document).ready(function () {
-                ShowToastMessageNotification('پیغام خطا', '@TempData["ToastErrorMessage"]', 'error');
+               
+                ShowToastMessageNotification('پیغام خطا', decodeURI(@TempData["ToastErrorMessage"]), 'error');
             });
         </script>
     }

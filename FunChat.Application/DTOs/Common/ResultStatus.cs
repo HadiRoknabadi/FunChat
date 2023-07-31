@@ -20,7 +20,10 @@ namespace FunChat.Application.DTOs.Common
         CanNotUploadFile,
 
         [Display(Name = "نیاز به وارد شدن به حساب کاربری")]
-        UnAuthorized
+        UnAuthorized,
+
+        [Display(Name = "خطای ناشناخته")]
+        IdentityError,
 
     }
 }

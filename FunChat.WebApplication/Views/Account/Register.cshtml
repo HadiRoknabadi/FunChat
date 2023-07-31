@@ -1,0 +1,42 @@
+@model FunChat.Application.DTOs.Account.RegisterUserDTO
+@{
+    ViewData["Title"] = "ثبت نام";
+}
+
+<form asp-controller="Account" asp-action="Register" method="post">
+    <div class="row g-3">
+        <div class="col-3">
+            <input asp-for="FullName" type="text" class="form-control" placeholder="نام و نام خانوادگی">
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="col-3">
+            <input asp-for="Email" type="text" class="form-control" placeholder="ایمیل">
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row g-3 mt-3">
+        <div class="col-3">
+            <input asp-for="Password" type="password" class="form-control" placeholder="رمز عبور">
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="col-3">
+            <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="تکرار رمز عبور">
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+        </div>
+    </div>
+    <div class="row g-3 mt-3">
+        <div class="col-3">
+            <button class="btn btn-success " type="submit">ثبت نام</button>
+        </div>
+        
+    </div>
+
+</form>
+
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

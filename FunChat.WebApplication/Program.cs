@@ -5,6 +5,12 @@ using FluentValidation;
 using FunChat.Application.DTOs.Account;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using FunChat.Application.Services.Interfaces;
+using FunChat.Application.Services.Implementations;
+using FunChat.Application.Services.Interfaces.Context;
+using FunChat.Persistence.Contexts;
+using FluentValidation.AspNetCore;
+using FunChat.Infrastructure.Senders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +22,13 @@ builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddIdentityService();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddTransient<IValidator<RegisterUserDTO>, RegisterUserValidator>();
 builder.Services.AddTransient<IValidator<LoginUserDTO>, LoginUserValidator>();
+builder.Services.AddScoped<IApplicationDbContext,ApplicationDbContext>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<ISenderService,SenderService>();
+builder.Services.AddScoped<IViewRenderService,ViewRenderService>();
 
 #region Html Encoder
 
