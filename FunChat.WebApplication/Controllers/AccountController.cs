@@ -117,6 +117,31 @@ namespace FunChat.WebApplication.Controllers
 
         #endregion
 
+        #region LogOut User
+
+        public async Task<IActionResult> LogOut()
+        {
+            var result = await _userService.LogOutUser(User.Identity.IsAuthenticated);
+
+            switch (result.Status)
+            {
+                case ResultStatus.Success:
+                    TempData[Toast_SuccessMessage] = result.StatusMessage;
+                    return RedirectToAction(nameof(Login));
+
+
+                case ResultStatus.UserIsNotAuthenticated:
+                    TempData[Toast_WarningMessage] = result.StatusMessage;
+                    return RedirectToAction(controllerName: "Home", actionName: "Index");
+
+
+            }
+
+            return RedirectToAction(nameof(Login));
+        }
+
+        #endregion
+
 
     }
 }

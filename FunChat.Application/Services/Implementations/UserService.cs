@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using System.Security.Principal;
+using AutoMapper;
 using FunChat.Application.DTOs.Account;
 using FunChat.Application.DTOs.Common;
 using FunChat.Application.Extensions;
@@ -127,6 +129,21 @@ namespace FunChat.Application.Services.Implementations
 
             return result;
 
+        }
+
+        public async Task<ApplicationResultDTO> LogOutUser(bool isUserAuthenticated)
+        {
+            var result=new ApplicationResultDTO();
+
+            if(isUserAuthenticated==false)
+            {
+                
+                return result;
+            }
+
+            await _signInManager.SignOutAsync();
+
+            return result;
         }
 
 
