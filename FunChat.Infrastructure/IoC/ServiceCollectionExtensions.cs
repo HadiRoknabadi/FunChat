@@ -12,6 +12,7 @@ namespace FunChat.Infrastructure.IoC
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("Application_ConnectionString"));
+                options.EnableSensitiveDataLogging();
             });
         }
     }

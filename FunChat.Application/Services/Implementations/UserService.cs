@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FunChat.Application.DTOs.Account;
 using FunChat.Application.DTOs.Common;
+using FunChat.Application.Extensions;
 using FunChat.Application.Services.Interfaces;
 using FunChat.Application.Services.Interfaces.Context;
 using FunChat.Domain.Entities.Account;
@@ -18,15 +19,18 @@ namespace FunChat.Application.Services.Implementations
         private readonly IMapper _mapper;
         private readonly IViewRenderService _viewRenderSerivce;
         private readonly ISenderService _senderService;
+        private readonly SignInManager<User> _signInManager;
 
-        public UserService(IApplicationDbContext context, UserManager<User> userManager, IMapper mapper, IViewRenderService viewRenderSerivce, ISenderService senderService)
+        public UserService(IApplicationDbContext context, UserManager<User> userManager, IMapper mapper, IViewRenderService viewRenderSerivce, ISenderService senderService, SignInManager<User> signInManager)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
             _viewRenderSerivce = viewRenderSerivce;
             _senderService = senderService;
+            _signInManager = signInManager;
         }
+
 
 
 
@@ -35,27 +39,14 @@ namespace FunChat.Application.Services.Implementations
         #endregion
 
 
-
+        #region Register User
         public async Task<ApplicationResultDTO<string>> RegisterUser(RegisterUserDTO registerUserDTO)
         {
             var result = new ApplicationResultDTO<string>
             {
                 Status = ResultStatus.Success,
-                StatusMessage = "عملیات با موفقیت انجام شد"
-                
+  
             };
-
-
-            // if (await IsExistUserByEmail(registerUserDTO.Email))
-            // {
-            //     result.Status = ResultStatus.EmailIsExist;
-            //     //result.Message = ResultStatus.EmailIsExist.GetEnumName();
-            //     result.Data = registerUserDTO.Email;
-
-            //     return result;
-
-            // }
-
 
             var user=_mapper.Map<RegisterUserDTO,User>(registerUserDTO);
 
@@ -63,13 +54,7 @@ namespace FunChat.Application.Services.Implementations
             if(createUserResult.Succeeded==false)
             {
                 result.Status = ResultStatus.IdentityError;
-                //result.Message = ResultStatus.IdentityError.GetEnumName();
-                var identityErrors = createUserResult.Errors.ToList();
-        
-                foreach (var error in identityErrors)
-                {
-                    result.ErrorMessages.Add(error.Description.Replace("\"", ""));
-                }
+                createUserResult.GetIdentityErrorMessages(result.ErrorMessages);
 
                 return result;
             }
@@ -83,11 +68,68 @@ namespace FunChat.Application.Services.Implementations
             return result;
         }
 
+        #endregion
+
         public async Task<bool> IsExistUserByEmail(string email)
         {
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
+        public async Task<ApplicationResultDTO> ActivateAccount(string emailActiveCode)
+        {
+            var result=new ApplicationResultDTO();
+            var user=await _context.Users.SingleOrDefaultAsync(u=>u.EmailActiveCode==emailActiveCode);
 
+            if(user==null)
+            {
+                result.Status=ResultStatus.NotFound;
+                result.ErrorMessages.Add("کاربری یافت نشد");
+
+                return result;
+            }
+
+            user.EmailConfirmed=true;
+            user.EmailActiveCode=Generators.Generators.GetEmailActivationCode();
+
+            await _context.SaveChangesAsync();
+
+
+            await _signInManager.SignInAsync(user,true);
+
+            return result; 
+
+
+        }
+
+        #region Login User
+
+        public async Task<ApplicationResultDTO> LoginUser(LoginUserDTO loginUserDTO)
+        {
+            var result=new ApplicationResultDTO();
+
+            var user=await _userManager.FindByEmailAsync(loginUserDTO.Email);
+
+            if(user==null)
+            {
+                result.Status=ResultStatus.NotFound;
+                result.ErrorMessages.Add("کاربری با این مشخصات یافت نشد");
+                return result;
+            }
+
+            if(user.EmailConfirmed==false)
+            {
+                result.Status=ResultStatus.AccountNotActivated;
+                result.ErrorMessages.Add("حساب شما فعال سازی نشده است");
+                return result;
+            }
+            
+            await _signInManager.SignInAsync(user,loginUserDTO.RememberMe);
+
+            return result;
+
+        }
+
+
+        #endregion
     }
 }

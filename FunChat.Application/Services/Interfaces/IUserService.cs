@@ -7,5 +7,7 @@ namespace FunChat.Application.Services.Interfaces
     {
         Task<ApplicationResultDTO<string>> RegisterUser(RegisterUserDTO registerUserDTO);
         Task<bool> IsExistUserByEmail(string email);
+        Task<ApplicationResultDTO> ActivateAccount(string emailActiveCode);
+        Task<ApplicationResultDTO> LoginUser(LoginUserDTO loginUserDTO);
     }
 }

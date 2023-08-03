@@ -14,13 +14,8 @@ namespace FunChat.Infrastructure.Senders
             mail.Subject = subject;
             mail.Body = body;
             mail.IsBodyHtml = true;
-
-            //System.Net.Mail.Attachment attachment;
-            // attachment = new System.Net.Mail.Attachment("c:/textfile.txt");
-            // mail.Attachments.Add(attachment);
-
             SmtpServer.Port = 587;
-            SmtpServer.Credentials = new System.Net.NetworkCredential("hadiroknabadi80@gmail.com", "HONEY1382264618412135");
+            SmtpServer.Credentials = new System.Net.NetworkCredential("hadiroknabadi80@gmail.com", "bivcldgmzaqupfra");
             SmtpServer.EnableSsl = true;
 
             SmtpServer.Send(mail);

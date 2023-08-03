@@ -20,6 +20,8 @@ namespace FunChat.WebApplication.Controllers
 
         #endregion
 
+        #region Register
+
         public IActionResult Register()
         {
             return View();
@@ -28,24 +30,93 @@ namespace FunChat.WebApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterUserDTO registerUserDTO)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var result=await _userService.RegisterUser(registerUserDTO);
+                var result = await _userService.RegisterUser(registerUserDTO);
 
-                switch(result.Status)
+                switch (result.Status)
                 {
                     case ResultStatus.Success:
-                    TempData[SweetAlert_SuccessMessage]=result.StatusMessage;
-                    break;
+                        TempData[SweetAlert_SuccessMessage] = result.StatusMessage;
+                        break;
 
                     case ResultStatus.IdentityError:
-                    TempData[SweetAlert_ErrorMessage]=JsonSerializer.Serialize(result.ErrorMessages);
-                    break;
+                        TempData[SweetAlert_ErrorMessage] = JsonSerializer.Serialize(result.ErrorMessages);
+                        break;
 
 
                 }
             }
             return View(registerUserDTO);
         }
+
+        #endregion
+
+        #region Activate Account
+
+        [Route("[controller]/[action]/{emailActiveCode}")]
+        public async Task<IActionResult> ActivateAccount(string emailActiveCode)
+        {
+            var result = await _userService.ActivateAccount(emailActiveCode);
+
+            switch (result.Status)
+            {
+                case ResultStatus.Success:
+                    TempData[Toast_SuccessMessage] = result.StatusMessage;
+                    return RedirectToAction(controllerName: "Home", actionName: "Index");
+
+                case ResultStatus.NotFound:
+                    TempData[SweetAlert_WarningMessage] = result.StatusMessage;
+                    break;
+            }
+
+            return View();
+        }
+
+        #endregion
+
+        #region Login
+
+        public IActionResult Login()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                TempData[SweetAlert_InfoMessage] = "شما داخل سایت لاگین هستید";
+                return RedirectToAction(controllerName: "Home", actionName: "Index");
+
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginUserDTO loginUserDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.LoginUser(loginUserDTO);
+
+                switch (result.Status)
+                {
+                    case ResultStatus.Success:
+                        TempData[Toast_SuccessMessage] = result.StatusMessage;
+                        return RedirectToAction(controllerName: "Home", actionName: "Index");
+
+                    case ResultStatus.AccountNotActivated:
+                        TempData[SweetAlert_WarningMessage] = JsonSerializer.Serialize(result.ErrorMessages);
+                        break;
+
+                    case ResultStatus.NotFound:
+                        TempData[SweetAlert_ErrorMessage] = JsonSerializer.Serialize(result.ErrorMessages);
+                        break;
+                }
+            }
+
+            return View(loginUserDTO);
+        }
+
+
+        #endregion
+
+
     }
 }

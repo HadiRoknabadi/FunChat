@@ -25,5 +25,8 @@ namespace FunChat.Application.DTOs.Common
         [Display(Name = "خطای ناشناخته")]
         IdentityError,
 
+        [Display(Name = "حساب فعال سازی نشده")]
+        AccountNotActivated
+
     }
 }
