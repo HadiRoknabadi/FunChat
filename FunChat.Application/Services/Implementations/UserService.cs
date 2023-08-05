@@ -6,13 +6,14 @@ using FunChat.Application.DTOs.Common;
 using FunChat.Application.Extensions;
 using FunChat.Application.Services.Interfaces;
 using FunChat.Application.Services.Interfaces.Context;
+using FunChat.Application.Utils;
 using FunChat.Domain.Entities.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace FunChat.Application.Services.Implementations
 {
-    public class UserService:IUserService
+    public class UserService : IUserService
     {
         #region Constructor
 
@@ -47,13 +48,13 @@ namespace FunChat.Application.Services.Implementations
             var result = new ApplicationResultDTO<string>
             {
                 Status = ResultStatus.Success,
-  
+
             };
 
-            var user=_mapper.Map<RegisterUserDTO,User>(registerUserDTO);
+            var user = _mapper.Map<RegisterUserDTO, User>(registerUserDTO);
 
             var createUserResult = await _userManager.CreateAsync(user, registerUserDTO.Password);
-            if(createUserResult.Succeeded==false)
+            if (createUserResult.Succeeded == false)
             {
                 result.Status = ResultStatus.IdentityError;
                 createUserResult.GetIdentityErrorMessages(result.ErrorMessages);
@@ -61,11 +62,11 @@ namespace FunChat.Application.Services.Implementations
                 return result;
             }
 
-            var emailActivation=_mapper.Map<User,EmailActivationDTO>(user);
+            var emailActivation = _mapper.Map<User, EmailActivationDTO>(user);
 
-            string emailBody=_viewRenderSerivce.RenderToStringAsync("_ActivateAccount",emailActivation);
+            string emailBody = _viewRenderSerivce.RenderToStringAsync("_ActivateAccount", emailActivation);
 
-            _senderService.SendEmail(user.Email,"فعالسازی حساب",emailBody);
+            _senderService.SendEmail(user.Email, "فعالسازی حساب", emailBody);
 
             return result;
         }
@@ -79,26 +80,26 @@ namespace FunChat.Application.Services.Implementations
 
         public async Task<ApplicationResultDTO> ActivateAccount(string emailActiveCode)
         {
-            var result=new ApplicationResultDTO();
-            var user=await _context.Users.SingleOrDefaultAsync(u=>u.EmailActiveCode==emailActiveCode);
+            var result = new ApplicationResultDTO();
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.EmailActiveCode == emailActiveCode);
 
-            if(user==null)
+            if (user == null)
             {
-                result.Status=ResultStatus.NotFound;
+                result.Status = ResultStatus.NotFound;
                 result.ErrorMessages.Add("کاربری یافت نشد");
 
                 return result;
             }
 
-            user.EmailConfirmed=true;
-            user.EmailActiveCode=Generators.Generators.GetEmailActivationCode();
+            user.EmailConfirmed = true;
+            user.EmailActiveCode = Generators.Generators.GetEmailActivationCode();
 
             await _context.SaveChangesAsync();
 
 
-            await _signInManager.SignInAsync(user,true);
+            await _signInManager.SignInAsync(user, true);
 
-            return result; 
+            return result;
 
 
         }
@@ -107,37 +108,41 @@ namespace FunChat.Application.Services.Implementations
 
         public async Task<ApplicationResultDTO> LoginUser(LoginUserDTO loginUserDTO)
         {
-            var result=new ApplicationResultDTO();
+            var result = new ApplicationResultDTO();
 
-            var user=await _userManager.FindByEmailAsync(loginUserDTO.Email);
+            var user = await _userManager.FindByEmailAsync(loginUserDTO.Email);
 
-            if(user==null)
+            if (user == null)
             {
-                result.Status=ResultStatus.NotFound;
+                result.Status = ResultStatus.NotFound;
                 result.ErrorMessages.Add("کاربری با این مشخصات یافت نشد");
                 return result;
             }
 
-            if(user.EmailConfirmed==false)
+            if (user.EmailConfirmed == false)
             {
-                result.Status=ResultStatus.AccountNotActivated;
+                result.Status = ResultStatus.AccountNotActivated;
                 result.ErrorMessages.Add("حساب شما فعال سازی نشده است");
                 return result;
             }
-            
-            await _signInManager.SignInAsync(user,loginUserDTO.RememberMe);
+
+            await _signInManager.SignInAsync(user, loginUserDTO.RememberMe);
 
             return result;
 
         }
 
+
+        #endregion
+
+        #region LogOut User
         public async Task<ApplicationResultDTO> LogOutUser(bool isUserAuthenticated)
         {
-            var result=new ApplicationResultDTO();
+            var result = new ApplicationResultDTO();
 
-            if(isUserAuthenticated==false)
+            if (isUserAuthenticated == false)
             {
-                
+
                 return result;
             }
 
@@ -146,7 +151,90 @@ namespace FunChat.Application.Services.Implementations
             return result;
         }
 
+        #endregion
+
+        #region Get User Profile Details For Edit
+
+        public async Task<ApplicationResultDTO<EditUserProfileDTO>> GetUserProfileDetailsForEdit(int userId)
+        {
+
+            var result = new ApplicationResultDTO<EditUserProfileDTO>();
+            
+
+            var user=await _userManager.FindByIdAsync(userId.ToString());
+
+            if(user==null)
+            {
+                result.Status=ResultStatus.NotFound;
+                return result;
+            }
+
+            var userProfileDetails=_mapper.Map<User,EditUserProfileDTO>(user);
+
+            result.Data=userProfileDetails;
+
+            return result;
+
+        }
+        
 
         #endregion
+
+        #region Edit User Profile
+
+        public async Task<ApplicationResultDTO> EditUserProfile(EditUserProfileDTO editUserProfileDTO)
+        {
+            var result=new ApplicationResultDTO();
+            if(editUserProfileDTO.Id==null) throw new NullReferenceException();
+            var user=await _userManager.FindByIdAsync(editUserProfileDTO.Id.ToString());
+
+            if(user==null)
+            {
+                result.Status=ResultStatus.NotFound;
+                return result;
+            }
+
+            user.FullName=editUserProfileDTO.FullName;
+
+            if (editUserProfileDTO.UserAvatarFile != null)
+            {
+                if (!editUserProfileDTO.UserAvatarFile.IsImage())
+                {
+                    result.Status = ResultStatus.CanNotUploadFile;
+                    return result;
+
+                }
+
+                var imageName = Generators.Generators.GenerateUniqCode() + Path.GetExtension(editUserProfileDTO.UserAvatarFile.FileName);
+
+                editUserProfileDTO.UserAvatarFile.AddImageToServer(imageName, PathExtension.UserAvatarOriginServer, 43, 43, PathExtension.UserAvatarThumbServer);
+
+                user.UserAvatar = imageName;
+
+            }
+            else
+            {
+                user.UserAvatar = "Default.jpg";
+            }
+
+
+           var updateUserResult= await _userManager.UpdateAsync(user);
+
+            if (updateUserResult.Succeeded == false)
+            {
+                result.Status = ResultStatus.IdentityError;
+                updateUserResult.GetIdentityErrorMessages(result.ErrorMessages);
+
+                return result;
+            }
+
+            return result;
+
+        }
+        
+
+        #endregion
+
+        
     }
 }

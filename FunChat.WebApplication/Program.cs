@@ -25,6 +25,7 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddTransient<IValidator<RegisterUserDTO>, RegisterUserValidator>();
 builder.Services.AddTransient<IValidator<LoginUserDTO>, LoginUserValidator>();
+builder.Services.AddTransient<IValidator<EditUserProfileDTO>, EditUserProfileValidator>();
 builder.Services.AddScoped<IApplicationDbContext,ApplicationDbContext>();
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<ISenderService,SenderService>();

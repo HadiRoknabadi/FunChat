@@ -16,6 +16,8 @@ namespace FunChat.Infrastructure.MappingProfile
 
 
             CreateMap<User,EmailActivationDTO>();
+
+            CreateMap<User,EditUserProfileDTO>().ReverseMap();
         }
     }
 }

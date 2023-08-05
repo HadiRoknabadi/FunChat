@@ -1,4 +1,5 @@
 ﻿@model FunChat.Application.DTOs.Account.EditUserProfileDTO
+@using FunChat.Application.Utils;
 @{
     Layout = "~/Views/Shared/_SiteLayout.cshtml";
 }
@@ -8,34 +9,59 @@
 
 
     <div class="col-8">
-       
-            <form asp-area="User" asp-controller="Account" asp-action="EditUserProfile" method="post">
-                <div class="row g-3">
-                    <div class="col-3">
-                        <input asp-for="FullName" type="text" class="form-control" placeholder="نام و نام خانوادگی">
-                        <span asp-validation-for="FullName" class="text-danger"></span>
-                    </div>
+
+        <form asp-area="User" asp-controller="Account" asp-action="EditUserProfile" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id">
+            <div class="row g-3">
+                <div class="col-3">
+                    <input asp-for="FullName" type="text" class="form-control" placeholder="نام و نام خانوادگی">
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-3">
+                    <label for="userAvatar" class="btn-primary rounded py-2 px-2" style="cursor: pointer;">انتخاب
+                        عکس</label>
+                    <input asp-for="UserAvatarFile" type="file" id="userAvatar" class="d-none">
+
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <label> تصویر انتخاب شده </label>
+
+                @if (Model.UserAvatar != "Default.jpg")
+                {
+                    <img class="max-width-100 max-height-100" src="@(PathExtension.UserAvatarThumb+Model.UserAvatar)"
+                        id="ImagePreview" style="max-width: 100px;max-height: 100px;">
+
+                }
+                else
+
+                {
+                    <img class="max-width-100 max-height-100" src="@(PathExtension.DefaultUserAvatar)" id="ImagePreview" style="max-width: 100px;max-height: 100px;">
+
+                }
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-3">
+                    <button class="btn btn-success " type="submit">ثبت</button>
                 </div>
 
-                <div class="row g-3 mt-3">
-                    <div class="col-3">
-                        <label for="userAvatar" class="btn-primary rounded py-2 px-2" style="cursor: pointer;">انتخاب عکس</label>
-                        <input asp-for="UserAvatar" type="file" id="userAvatar" class="d-none">
+            </div>
+        </form>
 
-                    </div>
-                </div>
-
-                 <div class="row g-3 mt-3">
-        <div class="col-3">
-            <button class="btn btn-success " type="submit">ثبت</button>
-        </div>
-        
-    </div>
-            </form>
-        
     </div>
 </div>
 
-
-
 </div>
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        ImagePreview("userAvatar");
+    </script>
+}

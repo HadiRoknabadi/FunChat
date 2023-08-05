@@ -10,5 +10,7 @@ namespace FunChat.Application.Services.Interfaces
         Task<ApplicationResultDTO> ActivateAccount(string emailActiveCode);
         Task<ApplicationResultDTO> LoginUser(LoginUserDTO loginUserDTO);
         Task<ApplicationResultDTO> LogOutUser(bool isUserAuthenticated);
+        Task<ApplicationResultDTO<EditUserProfileDTO>> GetUserProfileDetailsForEdit(int userId);
+        Task<ApplicationResultDTO> EditUserProfile(EditUserProfileDTO editUserProfileDTO);
     }
 }

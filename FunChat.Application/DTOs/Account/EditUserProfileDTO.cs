@@ -1,11 +1,14 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace FunChat.Application.DTOs.Account
 {
     public class EditUserProfileDTO
     {
+        public int? Id { get; set; }
         public string FullName { get; set; }
         public string UserAvatar { get; set; }
+        public IFormFile UserAvatarFile { get; set; }
     }
 
     public class EditUserProfileValidator:AbstractValidator<EditUserProfileDTO>
