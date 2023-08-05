@@ -20,6 +20,8 @@ namespace FunChat.WebApplication.Areas.User.Controllers
 
         #endregion
 
+        #region User Profile
+
         public async Task<IActionResult> UserProfile()
         {
             var userId=User.GetUserId();
@@ -49,5 +51,16 @@ namespace FunChat.WebApplication.Areas.User.Controllers
 
             return View(editUserProfileDTO);
         }
+
+        #endregion
+
+        #region Change User Password
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        #endregion
     }
 }

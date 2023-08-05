@@ -26,6 +26,7 @@ builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsi
 builder.Services.AddTransient<IValidator<RegisterUserDTO>, RegisterUserValidator>();
 builder.Services.AddTransient<IValidator<LoginUserDTO>, LoginUserValidator>();
 builder.Services.AddTransient<IValidator<EditUserProfileDTO>, EditUserProfileValidator>();
+builder.Services.AddTransient<IValidator<ChangeUserPasswordDTO>, ChangeUserPasswordValidator>();
 builder.Services.AddScoped<IApplicationDbContext,ApplicationDbContext>();
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<ISenderService,SenderService>();
