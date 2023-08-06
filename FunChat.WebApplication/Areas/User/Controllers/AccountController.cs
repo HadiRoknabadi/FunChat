@@ -24,26 +24,26 @@ namespace FunChat.WebApplication.Areas.User.Controllers
 
         public async Task<IActionResult> UserProfile()
         {
-            var userId=User.GetUserId();
-            var userProfileDetails=await _userService.GetUserProfileDetailsForEdit(userId);
+            var userId = User.GetUserId();
+            var userProfileDetails = await _userService.GetUserProfileDetailsForEdit(userId);
             return View(userProfileDetails.Data);
         }
 
 
         public async Task<IActionResult> EditUserProfile(EditUserProfileDTO editUserProfileDTO)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var result=await _userService.EditUserProfile(editUserProfileDTO);
+                var result = await _userService.EditUserProfile(editUserProfileDTO);
 
-                switch(result.Status)
+                switch (result.Status)
                 {
                     case ResultStatus.Success:
-                        TempData[SweetAlert_SuccessMessage]=result.StatusMessage;
+                        TempData[SweetAlert_SuccessMessage] = result.StatusMessage;
                         return RedirectToAction(nameof(UserProfile));
 
-                        case ResultStatus.CanNotUploadFile:
-                        TempData[SweetAlert_ErrorMessage]=result.StatusMessage;
+                    case ResultStatus.CanNotUploadFile:
+                        TempData[SweetAlert_ErrorMessage] = result.StatusMessage;
                         break;
                 }
             }
@@ -60,6 +60,25 @@ namespace FunChat.WebApplication.Areas.User.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangeUserPasswordDTO changeUserPasswordDTO)
+        {
+            if(ModelState.IsValid)
+            {
+                var result=await _userService.ChangeUserPassword(changeUserPasswordDTO);
+
+                switch(result.Status)
+                {
+                    case ResultStatus.Success:
+                        TempData[SweetAlert_SuccessMessage] = result.StatusMessage;
+                        TempData[Toast_InfoMessage]="مجددا وارد حساب کاربری خود شوید";
+                        return Redirect("/account/login");
+                }
+            }
+            return View(changeUserPasswordDTO);
+        }
+
 
         #endregion
     }

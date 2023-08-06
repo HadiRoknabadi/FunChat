@@ -12,5 +12,6 @@ namespace FunChat.Application.Services.Interfaces
         Task<ApplicationResultDTO> LogOutUser(bool isUserAuthenticated);
         Task<ApplicationResultDTO<EditUserProfileDTO>> GetUserProfileDetailsForEdit(int userId);
         Task<ApplicationResultDTO> EditUserProfile(EditUserProfileDTO editUserProfileDTO);
+        Task<ApplicationResultDTO> ChangeUserPassword(ChangeUserPasswordDTO changeUserPasswordDTO);
     }
 }

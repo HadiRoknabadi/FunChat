@@ -126,7 +126,12 @@ namespace FunChat.Application.Services.Implementations
                 return result;
             }
 
-            await _signInManager.SignInAsync(user, loginUserDTO.RememberMe);
+            var loginUserResult=await _signInManager.PasswordSignInAsync(user,loginUserDTO.Password, loginUserDTO.RememberMe,true);
+            if(loginUserResult.Succeeded==false)
+            {
+                 result.Status = ResultStatus.IdentityError;
+                return result;
+            }
 
             return result;
 
@@ -142,7 +147,6 @@ namespace FunChat.Application.Services.Implementations
 
             if (isUserAuthenticated == false)
             {
-
                 return result;
             }
 
@@ -232,6 +236,34 @@ namespace FunChat.Application.Services.Implementations
 
         }
         
+
+        #endregion
+
+        #region Change User Password
+
+        public async Task<ApplicationResultDTO> ChangeUserPassword(ChangeUserPasswordDTO changeUserPasswordDTO)
+        {
+            var result=new ApplicationResultDTO();
+
+            var user=await _userManager.FindByIdAsync(changeUserPasswordDTO.UserId.ToString());
+
+            if(user==null) throw new KeyNotFoundException();
+
+            var changeUserPasswordResult=await _userManager.ChangePasswordAsync(user,changeUserPasswordDTO.OldPassword,changeUserPasswordDTO.Password);
+
+            if(changeUserPasswordResult.Succeeded==false)
+            {
+                result.Status = ResultStatus.IdentityError;
+                changeUserPasswordResult.GetIdentityErrorMessages(result.ErrorMessages);
+
+                return result;
+            }
+
+            await _signInManager.SignOutAsync();
+
+            return result;
+        }
+
 
         #endregion
 
