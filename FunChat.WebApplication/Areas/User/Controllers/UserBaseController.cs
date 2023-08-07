@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FunChat.WebApplication.Areas.User.Controllers
 {
     [Area("User")]
+    [Authorize]
     public class UserBaseController:Controller
     {
          protected string Toast_ErrorMessage = "ToastErrorMessage";

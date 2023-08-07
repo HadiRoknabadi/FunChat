@@ -4,6 +4,7 @@
 }
 
 <form asp-controller="Account" asp-action="login" method="post">
+ <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
     <div class="row g-3">
         <div class="col-3">
             <input asp-for="Email" type="text" class="form-control" placeholder="ایمیل">

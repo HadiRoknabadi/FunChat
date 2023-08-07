@@ -28,6 +28,7 @@ namespace FunChat.WebApplication.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterUserDTO registerUserDTO)
         {
             if (ModelState.IsValid)
@@ -77,7 +78,7 @@ namespace FunChat.WebApplication.Controllers
 
         #region Login
 
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -85,11 +86,14 @@ namespace FunChat.WebApplication.Controllers
                 return RedirectToAction(controllerName: "Home", actionName: "Index");
 
             }
+
+             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginUserDTO loginUserDTO)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginUserDTO loginUserDTO,string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -99,6 +103,7 @@ namespace FunChat.WebApplication.Controllers
                 {
                     case ResultStatus.Success:
                         TempData[Toast_SuccessMessage] = result.StatusMessage;
+                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
                         return RedirectToAction(controllerName: "Home", actionName: "Index");
 
                     case ResultStatus.AccountNotActivated:
