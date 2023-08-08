@@ -1,8 +1,13 @@
+@using Microsoft.AspNetCore.Components.Web
+@{
+    var requestPath=Context.Request.Path;
+}
+
 <div class="col-4">
     <ul class="list-group">
-        <a asp-area="User" asp-controller="Account" asp-action="UserProfile" class="list-group-item active" aria-current="true">پروفایل</a>
-        <a asp-area="User" asp-controller="Account" asp-action="ChangePassword" class="list-group-item list-group-item-action">تغییر رمز عبور</a>
-        <a asp-area="User" asp-controller="Account" asp-action="Logout" class="list-group-item list-group-item-action">پیام ها</a>
-        <a asp-area="" asp-controller="Account" asp-action="Logout" class="list-group-item list-group-item-action">خروج از حساب کاربری</a>
+        <UserSidebarItem requested-path="@requestPath" Area="User" Controller="Account" Action="UserProfile" >پروفایل</UserSidebarItem>
+        <UserSidebarItem requested-path="@requestPath" Area="User" Controller="Account" Action="ChangePassword">تغییر رمز عبور</UserSidebarItem>
+        <UserSidebarItem requested-path="@requestPath" Area="User" Controller="Account" Action="Messages">پیامها</UserSidebarItem>
+        <UserSidebarItem requested-path="@requestPath" Area="User" Controller="Account" Action="Logout">خروج</UserSidebarItem>
     </ul>
 </div>
