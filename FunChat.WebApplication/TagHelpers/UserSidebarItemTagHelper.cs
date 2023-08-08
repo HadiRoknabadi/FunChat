@@ -35,8 +35,12 @@ namespace FunChat.WebApplication.TagHelpers
         private static string GetItemUrl(string controller, string action, string area = null)
         {
             StringBuilder itemUrl = new StringBuilder("/");
-            if (!string.IsNullOrEmpty(area)) itemUrl.Append(area);
-            itemUrl.Append("/");
+            if (!string.IsNullOrEmpty(area))
+            {
+                itemUrl.Append(area);
+                itemUrl.Append("/");
+
+            }
             itemUrl.Append(controller);
             itemUrl.Append("/");
             itemUrl.Append(action);
